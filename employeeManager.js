@@ -12,6 +12,11 @@ const connection = mysql.createConnection({
   database: 'employeeDB',
 });
 
+connection.connect((err) => {
+  if (err) throw err;
+  runManager();
+});
+
 console.log('\n')
 figlet('Employee Manager', function (err, data) {
   if (err) {
@@ -23,10 +28,7 @@ figlet('Employee Manager', function (err, data) {
   console.log('\n')
 });
 
-connection.connect((err) => {
-  if (err) throw err;
-  runManager();
-});
+
 
 const runManager = () => {
   inquirer
@@ -45,7 +47,7 @@ const runManager = () => {
         'Quit',
       ],
     }).then((answer) => {
-      switch (answer.action) {
+      switch (answer.question) {
         case 'View all Employees':
           viewEmployees();
           break;
@@ -75,16 +77,17 @@ const runManager = () => {
           break;
 
         default:
-          console.log(`Invalid action: ${answer.action}`);
+          console.log(`Invalid action: ${answer.question}`);
           break;
       }
     });
 };
 
 const viewEmployees = () => {
-  connection.query('SELECT * FROM employees', (err, res) => {
+  connection.query('SELECT employees.first_name, employees.last_name, roles.title, roles.salary, departments.department_name FROM employees, roles, departments WHERE employees.role_id = roles.id AND roles.department_id = departments.id', (err, res) => {
     if (err) throw err;
     // Log all results of the SELECT statement
-    console.log(res);
+    console.table(res);
+    runManager();
   });
 };
