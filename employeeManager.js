@@ -1,8 +1,9 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const express = require('express');
 const figlet = require('figlet');
+const hotkeys = require('hotkeys-js');
 const { Console } = require('console');
+
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -76,6 +77,13 @@ const runManager = () => {
           updateEmployee();
           break;
 
+        case 'Quit':
+          console.log("Thank you for your updates!")
+          // hotkeys('ctrl+c', function (event, handler){
+          //   return
+          // })
+          return;
+
         default:
           console.log(`Invalid action: ${answer.question}`);
           break;
@@ -91,3 +99,8 @@ const viewEmployees = () => {
     runManager();
   });
 };
+
+
+// const addDepartment = () => {
+
+// }
