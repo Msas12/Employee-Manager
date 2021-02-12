@@ -94,7 +94,7 @@ const runManager = () => {
 
 // View all Employees
 const viewEmployees = () => {
-  connection.query('SELECT employees.id, employees.first_name, employees.last_name, roles.title, roles.salary, departments.department_name, manager_id FROM employees, roles, departments WHERE employees.role_id = roles.id AND roles.department_id = departments.id;', (err, res) => {
+  connection.query('SELECT employees.id as "ID", employees.first_name as "First Name", employees.last_name as "Last Name", roles.title as "Position", departments.department_name as "Department", roles.salary as "Salary", CONCAT(m.first_name, " ", m.last_name) as "Manager" FROM employees LEFT JOIN employees m ON m.id = employees.manager_id JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id', (err, res) => {
     if (err) throw err
 
     console.log('\n')
@@ -144,7 +144,7 @@ const addDepartment = () => {
       const query = 'INSERT INTO departments (department_name) VALUES (?)';
       connection.query(query, [answer.department], (err, res) => {
         if (err) throw err;
-        
+
         console.log('\n')
         console.log(`You have succes fully added ${answer.department} to Departments`)
         console.log('\n')
