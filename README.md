@@ -16,7 +16,7 @@
 
 The following animation demonstrates the application functionality:
 
-![GIF Of Functionality](./INSERT GIF HERE)
+![GIF Of Functionality](./employee.gif)
 
 ## Description
 Node Application that allows you to manage employees
