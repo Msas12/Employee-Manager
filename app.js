@@ -73,14 +73,11 @@ const runManager = () => {
           break;
 
         case 'Update Employee Role':
-          updateEmployee();
+          updateEmployeeRole();
           break;
 
         case 'Quit':
           console.log("Thank you for your updates!")
-          // hotkeys('ctrl+c', function (event, handler){
-          //   return
-          // })
           return;
 
         default:
@@ -190,56 +187,99 @@ const addRole = () => {
   });
 }
 
-// // Add an Employee
-// const addEmployee = () => {
-//   getRoles()
-//   getManagers()
+// Add an Employee
+const addEmployee = () => {
+  getRoles()
+  getManagers()
 
-//   inquirer.prompt([
-//     {
-//       name: 'firstname',
-//       type: 'input',
-//       message: 'First Name: ',
-//     },
-//     {
-//       name: 'lastname',
-//       type: 'input',
-//       message: 'Last Name: ',
-//     },
-//     {
-//       name: 'role',
-//       type: 'list',
-//       message: 'Role: ',
-//       choices: rolesArry,
-//     },
-//     {
-//       name: 'manager',
-//       type: 'list',
-//       message: 'Manager: ',
-//       choices: managersArry,
-//     }
-//   ]).then((answers) => {
-//     let roleChoice = rolesArry.indexOf(answers.role)+1
-//     let managerChoice = managersArry.indexOf(answers.manager)+1
+  inquirer.prompt([
+    {
+      name: 'firstname',
+      type: 'input',
+      message: 'First Name: ',
+    },
+    {
+      name: 'lastname',
+      type: 'input',
+      message: 'Last Name: ',
+    },
+    {
+      name: 'role',
+      type: 'list',
+      message: 'Role: ',
+      choices: rolesArry,
+    },
+    {
+      name: 'manager',
+      type: 'list',
+      message: 'Manager: ',
+      choices: managersArry,
+    }
+  ]).then((answers) => {
+    let roleChoice = rolesArry.indexOf(answers.role)+1
+    let managerChoice = managersArry.indexOf(answers.manager)+2
     
-//     const query = 'INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)';
-//     connection.query(query, [answers.firstname, answers.lastname, roleChoice, managerChoice], (err, res) => {
-//       if (err) throw err;
+    const query = 'INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)';
+    connection.query(query, [answers.firstname, answers.lastname, roleChoice, managerChoice], (err, res) => {
+      if (err) throw err;
 
-//       console.log('\n')
-//       console.log(`You have succesfully added ${answers.firstname} ${answers.lastname} to Employees`)
-//       console.log('\n')
-//       runManager();
-//     });
-//   });
-// }
+      console.log('\n')
+      console.log(`You have succesfully added ${answers.firstname} ${answers.lastname} to Employees`)
+      console.log('\n')
+      runManager();
+    });
+  });
+}
+
+
+// Update Employee ------------------------------------------------------------------------------------
+
+// Updates Employee Role
+const updateEmployeeRole = () => {
+  getAllEmployees()
+  getRoles()
+
+  inquirer.prompt([
+    {
+      name: 'confirm',
+      type: 'list',
+      message: 'Confrim you would like to update an employee (Yes/No): ',
+      choices: ['Yes', 'No'],
+    },
+    {
+      name: 'employee',
+      type: 'list',
+      message: 'Employee to Update: ',
+      choices: employeesArry,
+    },
+    {
+      name: 'newRole',
+      type: 'list',
+      message: 'New Role: ',
+      choices: rolesArry,
+    }
+  ]).then((answers) => {
+    let roleChoice = rolesArry.indexOf(answers.newRole)+1
+    let employeeID = employeesArry.indexOf(answers.employee)+1
+    
+    const query = 'UPDATE employees SET role_id = ? WHERE id = ?';
+    connection.query(query, [roleChoice, employeeID], (err, res) => {
+      if (err) throw err;
+
+      console.log('\n')
+      console.log(`You have succesfully updated ${answers.employee}'s Role`)
+      console.log('\n')
+      runManager();
+    });
+  });
+}
 
 
 // Gets Items to be used for inquirer choices---------------------------------------------------------------
 
 let departmentsArry = []
 
-// Get's Departments and stores them in gloobal departmentsArry
+// Get's Departments and stores them in global departmentsArry
 const getDepartments = () => {
   connection.query('SELECT * FROM departments', (err, res) => {
     if (err) throw err
@@ -251,25 +291,36 @@ const getDepartments = () => {
 
 let managersArry = []
 
-// // Get's Managers and stores them in gloobal managersArry
-// const getManagers = () => {
-//   connection.query('SELECT DISTINCT CONCAT(first_name, " ", last_name) as "Manager" FROM employees WHERE manager_id IS NULL', (err, res) => {
-//     if (err) throw err
-//     for (i=0; i<res.length; i++) {
-//       managersArry.push(res[i].Manager)
-//       console.log(managersArry)
-//     }
-//   })
-// };
+// Get's Managers and stores them in global managersArry
+const getManagers = () => {
+  connection.query('SELECT DISTINCT CONCAT(first_name, " ", last_name) as "Manager" FROM employees WHERE manager_id IS NULL', (err, res) => {
+    if (err) throw err
+    for (i=0; i<res.length; i++) {
+      managersArry.push(res[i].Manager)
+    }
+  })
+};
 
 let rolesArry = []
 
-// Get's Roles and stores them in gloobal rolesArry
+// Get's Roles and stores them in global rolesArry
 const getRoles = () => {
   connection.query('SELECT * FROM roles', (err, res) => {
     if (err) throw err
     for (i=0; i<res.length; i++) {
-      rolesArry.push(res[i].title)
+      rolesArry.push(res[i].title) 
+    }
+  })
+};
+
+let employeesArry = []
+
+// Get's Employee Names and stores them in global managersArry
+const getAllEmployees = () => {
+  connection.query('SELECT CONCAT(first_name, " ", last_name) as "Employee" FROM employees', (err, res) => {
+    if (err) throw err
+    for (i=0; i<res.length; i++) {
+      employeesArry.push(res[i].Employee)
     }
   })
 };
